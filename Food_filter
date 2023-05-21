@@ -1,0 +1,36 @@
+import pandas as pd
+import random
+
+rec = pd.read_csv('Diet.csv')
+want = input("Favorite (chicken, salmon, etc.): ").rstrip('s')
+allergic = input("Allergic (bean, milk, egg, etc.): ")
+diet = input("Diet type (Low-Carb Diet, Mediterranean Diet): ").capitalize()
+
+if allergic == "-":
+    allergic = []
+else:
+    allergic = [a.strip() for a in allergic.split(",")]
+
+if want == "-":
+    want = ""
+else:
+    want = want.strip()
+
+if diet == "-":
+    diet = ""
+else:
+    diet = diet.strip()
+
+filtered_data = rec[rec['Ingredient'].str.contains(want, case=False)]
+filtered_data = filtered_data[filtered_data['Diet\'s type'].str.contains(diet, case=False)]
+
+for a in allergic:
+    if a == "seafood":
+        filtered_data = filtered_data[~filtered_data['Ingredient'].str.contains('shrimp|shell|squid|fish', case=False, regex=True)]
+    else:
+        filtered_data = filtered_data[~filtered_data['Ingredient'].str.contains(a, case=False)]
+
+random_row = filtered_data.sample(n=1)
+
+print('\n', "*** Recommended dish for your choice ***", '\n')
+print(random_row['Name'].values[0], "Diet's type:", random_row['Diet\'s type'].values[0])
